@@ -1,0 +1,65 @@
+<?xml version="1.0"?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../../../Config/etc/system_file.xsd">
+    <system>
+        <tab id="verificounity" translate="label" sortOrder="1" class="verifico-tab verifico-tab-container">
+            <label>AgeChecked Plus+</label>
+        </tab>
+        <section id="verificounitysection" translate="label" sortOrder="130" showInDefault="1" showInWebsite="1" showInStore="1">
+            <class>separator-top</class>
+            <label>Settings</label>
+            <tab>verificounity</tab>
+            <resource>Verifico_Ageverify::age_configuration</resource>
+
+            <group id="setup" translate="label" type="text" sortOrder="0" showInDefault="1" showInWebsite="1" showInStore="1">
+                <label>Start using AgeChecked Plus+</label>
+                <attribute type="expanded">1</attribute>
+                <field id="verifico_setup" showInDefault="1" showInWebsite="1" showInStore="1" sortOrder="0">
+                        <frontend_model>Verifico\Ageverify\Block\Adminhtml\System\Config\Advanced</frontend_model>
+                        <attribute type="shared">1</attribute>
+                </field>
+            </group>
+            
+            <group id="general" translate="label" type="text" sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="1">
+                <label>General Configuration</label>
+                <attribute type="expanded">1</attribute>
+                
+                
+                <!--field id="enable" translate="label" type="select" sortOrder="0" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Enable AgeChecked</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                </field-->
+
+
+                
+
+                <field id="only_flagged_products" translate="label" type="select" sortOrder="80" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Verify Mode</label>
+                    <!--source_model>Magento\Config\Model\Config\Source\Yesno</source_model-->
+                    <source_model>Verifico\Ageverify\Model\Config\Source\Allspecificproducts</source_model>
+                    <comment>You can set which products you want age verification on. By default all orders are verified.</comment>
+                </field>
+
+
+                <field id="assign_category" translate="label" type="multiselect" sortOrder="92" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Select categories to verify</label>
+                    <source_model>Verifico\Ageverify\Model\Config\Source\Categorylist</source_model>
+                    <depends>
+                        <field id="only_flagged_products">2</field>
+                    </depends>
+                </field>
+
+                <field id="assign_products" translate="label" type="note" sortOrder="93" showInDefault="1" showInWebsite="1" showInStore="1">
+                    
+                    <depends>
+                        <field id="only_flagged_products">1</field>
+                    </depends>
+                    <comment>You can set an individual product to verify by editing the product in the Magento admin panel and placing a tick in the AgeChecked section.</comment>
+                
+                </field>
+            </group>
+            
+
+
+        </section>
+    </system>
+</config>

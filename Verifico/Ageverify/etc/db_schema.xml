@@ -1,0 +1,9 @@
+<?xml version="1.0"?>
+<schema xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:Setup/Declaration/Schema/etc/schema.xsd">
+   <table name="sales_order">
+       <column xsi:type="varchar" name="unity_age_verification_status" nullable="true" comment="Age Verification Status" />
+   </table>
+   <table name="sales_order_grid">
+       <column xsi:type="varchar" name="unity_age_verification_status" nullable="true" comment="Age Verification Status" />
+   </table>
+</schema>

@@ -1,0 +1,47 @@
+<!-- BEGIN Verifico_Ageverify -->
+    <?php 
+
+    $order = $block->getOrder();
+    $billingAddress = $order->getBillingAddress();
+    $items = $block->getAvOrderItems();
+    // $customerAttributes = $block->getCustomerAttributes();
+    // $customerAttVal = $customerAttributes['nosto_customer_reference']->getValue();
+ 
+    ?>
+
+
+<script type="text/javascript">
+var acTransaction = {
+    "user":[{
+    "email":"<?= $order->getCustomerEmail() ?>",
+    "firstname":"<?= $billingAddress->getFirstname() ?>",
+    "lastname":"<?= $billingAddress->getLastname() ?>",
+    "dob":"<?= $order->getCustomerDob() ?>",
+    "order_id":"<?= $order->getId() ?>",
+    "order_ref":"<?= $order->getIncrementId() ?>",
+    "address":{
+    "address1":"<?= $billingAddress->getStreet()[0] ?>",
+    "address2":"",
+    "address3":"",
+    "city":"<?= $billingAddress->getCity() ?>",
+    "postcode":"<?= $billingAddress->getPostcode() ?>",
+    "county":"<?= $billingAddress->getRegion() ?>",
+    "country":"<?= $billingAddress->getCountryId() ?>"
+    }
+    }
+    ],
+    "cart": [{"products":[
+
+    <?php foreach($items as $i): ?>
+
+    <?php $product = $block->getAVProduct($i['getSku']);
+
+    ?>
+    {"id":"<?= $i['getSku'] ?>","name":"<?= $i['getName'] ?>","price":"<?= $i['getBaseRowTotalInclTax'] ?>","quantity":<?= (int) $i['getQtyOrdered']?>,"requires_av":"<?= $i['requires_av'] ?>"},
+
+    <?php endforeach; ?>
+
+    ]}]
+};
+</script>
+<!-- END Verifico_Ageverify -->
