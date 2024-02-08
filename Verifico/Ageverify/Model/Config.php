@@ -9,9 +9,7 @@ class Config
     }
 
     public function getUnityUrl() {
-        // return "https://verifico.co.uk";
-        return "https://staging.unity.agechecked.com";
-        // return "https://unity.agechecked.com";
+        return "https://agechecked.verifico.io";
     }
 
     public function getUnityIntegrationName() {
@@ -46,5 +44,3 @@ class Config
     
 
 }
-
-

@@ -13,7 +13,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
 	public function getApiVerificoEnable()
     {
 		return $this->scopeConfig->getValue(
-		'verificoverify/general/enable',
+		'verificounitysection/general/enable',
 		\Magento\Store\Model\ScopeInterface::SCOPE_STORE
 		);
     }
@@ -21,7 +21,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     public function getApiVerificoMode()
     {
 		return $this->scopeConfig->getValue(
-		'verificounity/general/only_flagged_products',
+		'verificounitysection/general/only_flagged_products',
 		\Magento\Store\Model\ScopeInterface::SCOPE_STORE
 		);
     }
@@ -29,25 +29,25 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
 	public function getSelectedCategory()
     {
 		return $this->scopeConfig->getValue(
-		'verificounity/general/only_flagged_products',
+		'verificounitysection/general/assign_category',
 		\Magento\Store\Model\ScopeInterface::SCOPE_STORE
 		);
     } 
 
-    public function getEnabledCountries()
-    {	
-		return $this->scopeConfig->getValue(
-		'verificounity/general/only_flagged_products',
-		\Magento\Store\Model\ScopeInterface::SCOPE_STORE
-		);
-    }
+    // public function getEnabledCountries()
+    // {	
+	// 	return $this->scopeConfig->getValue(
+	// 	'verificounity/general/only_flagged_products',
+	// 	\Magento\Store\Model\ScopeInterface::SCOPE_STORE
+	// 	);
+    // }
 
-    public function getCountries()
-    {
-		return $this->scopeConfig->getValue(
-		'verificounity/general/only_flagged_products',
-		\Magento\Store\Model\ScopeInterface::SCOPE_STORE
-		);
-    }
+    // public function getCountries()
+    // {
+	// 	return $this->scopeConfig->getValue(
+	// 	'verificounity/general/only_flagged_products',
+	// 	\Magento\Store\Model\ScopeInterface::SCOPE_STORE
+	// 	);
+    // }
     
 }

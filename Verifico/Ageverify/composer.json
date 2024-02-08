@@ -2,7 +2,7 @@
   "name": "verifico/ageverify",
   "description": "A module to be able to check customer age in Magento 2",
   "type": "magento2-module",
-  "version": "1.0.0",
+  "version": "1.0.11",
   "license": [
     "OSL-3.0",
     "AFL-3.0"
@@ -19,7 +19,7 @@
     {
       "name": "Verifico",
       "email": "support@verifico.co.uk",
-      "homepage": "https://www.verifico.co.uk",
+      "homepage": "https://www.verifico.io",
       "role": "Integration Partner"
     }
   ],

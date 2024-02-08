@@ -3,34 +3,41 @@
     <policies>
         <policy id="script-src">
             <values>
-                <value id="verifico" type="host">verifico.co.uk</value>
+                <value id="verifico" type="host">agechecked.verifico.io</value>
                 <value id="agechecked" type="host">unity.agechecked.com</value>
             </values>
         </policy>
         <policy id="style-src">
             <values>
-                <value id="verifico" type="host">verifico.co.uk</value>
+                <value id="verifico" type="host">agechecked.verifico.io</value>
                 <value id="agechecked" type="host">unity.agechecked.com</value>
             </values>
         </policy>
         <policy id="img-src">
             <values>
-                <value id="verifico" type="host">verifico.co.uk</value>
+                <value id="verifico" type="host">agechecked.verifico.io</value>
                 <value id="agechecked" type="host">unity.agechecked.com</value>
             </values>
         </policy>
         <policy id="connect-src">
             <values>
-                <value id="verifico" type="host">verifico.co.uk</value>
+                <value id="verifico" type="host">agechecked.verifico.io</value>
                 <value id="agechecked" type="host">unity.agechecked.com</value>
             </values>
         </policy>
         <policy id="font-src">
             <values>
-                <value id="verifico" type="host">verifico.co.uk</value>
+                <value id="verifico" type="host">agechecked.verifico.io</value>
                 <value id="agechecked" type="host">unity.agechecked.com</value>
             </values>
         </policy>
+        <policy id="frame-src">
+            <values>
+                <value id="verifico" type="host">agechecked.verifico.io</value>
+                <value id="agechecked" type="host">unity.agechecked.com</value>
+            </values>
+        </policy>
+        
         <storefront>
             <frame-ancestors>
                 <policy_id>frame-ancestors</policy_id>

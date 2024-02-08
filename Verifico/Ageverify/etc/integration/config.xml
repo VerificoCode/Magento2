@@ -1,7 +1,7 @@
 <integrations>
     <integration name="AgeCheckedPlus+Verifico">
        <email>agechecked@verifico.co.uk</email>
-       <endpoint_url>https://staging.unity.agechecked.com/setup/magento-callback/</endpoint_url>
-       <identity_link_url>https://staging.unity.agechecked.com/setup/magento-oauth-save/</identity_link_url>
+       <endpoint_url>https://agechecked.verifico.io/setup/magento-callback/</endpoint_url>
+       <identity_link_url>https://agechecked.verifico.io/setup/magento-oauth-save/</identity_link_url>
     </integration>
  </integrations>

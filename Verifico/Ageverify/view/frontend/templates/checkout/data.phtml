@@ -4,11 +4,8 @@
     $order = $block->getOrder();
     $billingAddress = $order->getBillingAddress();
     $items = $block->getAvOrderItems();
-    // $customerAttributes = $block->getCustomerAttributes();
-    // $customerAttVal = $customerAttributes['nosto_customer_reference']->getValue();
  
     ?>
-
 
 <script type="text/javascript">
 var acTransaction = {
@@ -33,10 +30,7 @@ var acTransaction = {
     "cart": [{"products":[
 
     <?php foreach($items as $i): ?>
-
-    <?php $product = $block->getAVProduct($i['getSku']);
-
-    ?>
+        
     {"id":"<?= $i['getSku'] ?>","name":"<?= $i['getName'] ?>","price":"<?= $i['getBaseRowTotalInclTax'] ?>","quantity":<?= (int) $i['getQtyOrdered']?>,"requires_av":"<?= $i['requires_av'] ?>"},
 
     <?php endforeach; ?>

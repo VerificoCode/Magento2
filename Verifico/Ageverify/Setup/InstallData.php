@@ -224,7 +224,7 @@ public function install(ModuleDataSetupInterface $setup, ModuleContextInterface 
                         'visible' => true,
                         'required' => false,
                         'user_defined' => false,
-                        'default' => '1',
+                        'default' => '0',
                         'searchable' => false,
                         'filterable' => false,
                         'comparable' => false,

@@ -36,17 +36,28 @@ class Success extends \Magento\Checkout\Block\Onepage\Success {
         return $this->_checkoutSession->getLastRealOrder();
     }
 
-    public function getAvOrderItems() {
+    public function getAvOrderItems($order = []) {
         
-        $orderAllItems = $this->_checkoutSession->getLastRealOrder()->getAllItems();
+        if(empty($order)) {
+            $orderAllItems = $this->_checkoutSession->getLastRealOrder()->getAllItems();
+        } else {
+            $orderAllItems = $order->getAllItems();
+        }
+        
+        return $this->processOrderItems($orderAllItems);
+        
+    }
 
+    public function processOrderItems($orderAllItems) {
         $i = [];
+
 
         //Check verify mode and if selected products skip verify if nothing needs verification
         if($this->_helperData->getApiVerificoMode()==1) {
 
             $s=0;
             if ($orderAllItems) {
+                
                 foreach ($orderAllItems as $item) {
                     $verify = 0;
                     $product = $item->getProduct();
@@ -72,6 +83,7 @@ class Success extends \Magento\Checkout\Block\Onepage\Success {
             $selectedCategories = explode(',', $this->_helperData->getSelectedCategory());
             $s=0;
             if ($orderAllItems) {
+                
                 foreach ($orderAllItems as $item) {
                     $verify = 0;
                     $product = $item->getProduct();
@@ -106,6 +118,7 @@ class Success extends \Magento\Checkout\Block\Onepage\Success {
                 }
             }
         }
+
         return $i;
     }
 
