@@ -1,0 +1,26 @@
+{
+  "name": "verifico/ageverify",
+  "description": "AgeChecked Plus+ age verification module for Magento 2",
+  "type": "magento2-module",
+  "license": "GPL-3.0-or-later",
+  "require": {
+    "php": "^7.4 || ^8.1 || ^8.2 || ^8.3 || ^8.4",
+    "magento/framework": "^103.0"
+  },
+  "authors": [
+    {
+      "name": "Verifico",
+      "email": "support@verifico.co.uk",
+      "homepage": "https://www.verifico.io",
+      "role": "Integration Partner"
+    }
+  ],
+  "autoload": {
+    "files": [
+      "registration.php"
+    ],
+    "psr-4": {
+      "Verifico\\Ageverify\\": ""
+    }
+  }
+}
