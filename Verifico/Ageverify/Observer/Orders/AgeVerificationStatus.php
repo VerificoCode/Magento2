@@ -5,13 +5,24 @@ use Magento\Framework\Event\ObserverInterface;
 
 class AgeVerificationStatus implements ObserverInterface
 {   
-  public function __construct    (             
+  /** @var \Magento\Sales\Model\Order */
+  private $order;
+
+  /** @var \Verifico\Ageverify\Model\Verify */
+  private $verify;
+
+  /** @var \Verifico\Ageverify\Helper\Data */
+  private $helperData;
+
+  public function __construct(
    \Magento\Sales\Model\Order $order,
-   \Verifico\Ageverify\Model\Verify $verify
+   \Verifico\Ageverify\Model\Verify $verify,
+   \Verifico\Ageverify\Helper\Data $helperData
   ) 
 {        
  $this->order = $order; 
- $this->verify = $verify;    
+ $this->verify = $verify;
+ $this->helperData = $helperData;
 }
 
 public function execute(\Magento\Framework\Event\Observer $observer)
@@ -22,6 +33,15 @@ public function execute(\Magento\Framework\Event\Observer $observer)
 
   $order = $observer->getEvent()->getOrder();
 
+  if(!$order instanceof \Magento\Sales\Model\Order) {
+    return;
+  }
+
+  if (!$this->helperData->isEnabled($order->getStoreId())) {
+    $order->setUnityAgeVerificationStatus('Age Verification Disabled');
+    return;
+  }
+
   $shouldVerify = $this->verify->shouldVerify($order);
 
   if($shouldVerify) {
@@ -31,13 +51,13 @@ public function execute(\Magento\Framework\Event\Observer $observer)
     }
     
     $order->setUnityAgeVerificationStatus('Pending');
-    $order->save();
+    // $order->save();
 
   } else  {
 
     // If the order does not require age verification
     $order->setUnityAgeVerificationStatus('Age Verification Not Required');
-    $order->save();
+    // $order->save();
 
   }
 

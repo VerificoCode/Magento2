@@ -106,9 +106,9 @@ public function install(ModuleDataSetupInterface $setup, ModuleContextInterface 
         $data[] = ['status' => $code, 'label' => $info];
     }
     //create status
-    try {
-        // $setup->getConnection()->insertArray($setup->getTable('sales_order_status'), ['status', 'label'], $data);
-    } catch(\Exception $e) {}
+    // try {
+    //     // $setup->getConnection()->insertArray($setup->getTable('sales_order_status'), ['status', 'label'], $data);
+    // } catch(\Exception $e) {}
 
     $data = [];
 
@@ -156,30 +156,6 @@ public function install(ModuleDataSetupInterface $setup, ModuleContextInterface 
     }
 
 
-
-    // //Insert row for associate
-    // try {
-        
-    //     $setup->getConnection()->insertArray(
-    //     $setup->getTable('sales_order_status_state'),
-    //     ['status', 'state', 'is_default'],
-    //     $data
-    // );
-    // } catch(\Exception $e) {
-    //     echo 'NOOOOOOO';
-    // }
-
-    // /** Update visibility for states */
-    // $states = ['new', 'processing', 'complete', 'closed', 'canceled', 'holded', 'payment_review'];
-    // foreach ($states as $state) {
-    //     $setup->getConnection()->update(
-    //         $setup->getTable('sales_order_status_state'),
-    //         ['visible_on_front' => 1],
-    //         ['state = ?' => $state]
-    //     );
-    // }
-
-
     $eavSetup = $this->eavSetupFactory->create(['setup' => $setup]);
 
         
@@ -188,7 +164,6 @@ public function install(ModuleDataSetupInterface $setup, ModuleContextInterface 
         $categorySetup = $this->categorySetupFactory->create(['setup' => $setup]);
         
         $attributeSetId = $categorySetup->getDefaultAttributeSetId(\Magento\Catalog\Model\Product::ENTITY);
-        //$attributeSetIds = $categorySetup->getAttributeSetIds(\Magento\Catalog\Model\Product::ENTITY);
         $attributeGroupName = $this->unityConfig->getUnityName();
 
 

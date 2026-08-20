@@ -1,32 +1,34 @@
 {
-  "name": "verifico/ageverify",
-  "description": "A module to be able to check customer age in Magento 2",
-  "type": "magento2-module",
-  "version": "1.0.11",
-  "license": [
-    "OSL-3.0",
-    "AFL-3.0"
-  ],
-  "require": {
-    "php": "~7.4.0||~8.1.0",
-    "magento/module-checkout": "100.1.*",
-    "magento/module-quote": "100.1.*",
-    "magento/module-store": "100.1.*",        
-    "magento/framework": "100.1.*",
-    "magento/module-integration": "2.0.0"
-  },
-  "authors": [
-    {
-      "name": "Verifico",
-      "email": "support@verifico.co.uk",
-      "homepage": "https://www.verifico.io",
-      "role": "Integration Partner"
+    "name": "verifico/ageverify",
+    "description": "A module to be able to check customer age in Magento 2",
+    "type": "magento2-module",
+    "version": "1.0.19",
+    "license": [
+        "OSL-3.0",
+        "AFL-3.0"
+    ],
+    "require": {
+        "php": "~7.4.0||~8.2.0",
+        "magento/module-checkout": "100.1.*",
+        "magento/module-quote": "100.1.*",
+        "magento/module-store": "100.1.*",
+        "magento/framework": "100.1.*",
+        "magento/module-integration": "2.0.0"
+    },
+    "authors": [
+        {
+            "name": "Verifico",
+            "email": "support@verifico.co.uk",
+            "homepage": "https://www.verifico.io",
+            "role": "Integration Partner"
+        }
+    ],
+    "autoload": {
+        "files": [
+            "registration.php"
+        ],
+        "psr-4": {
+            "Verifico\\Ageverify\\": ""
+        }
     }
-  ],
-  "autoload": {
-    "files": [ "registration.php" ],
-    "psr-4": {
-      "Verifico\\Ageverify\\": ""
-    }
-  }
 }

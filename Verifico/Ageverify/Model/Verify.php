@@ -88,13 +88,32 @@ class Verify {
 
     public function shouldVerify($order) {
 
+        $storeId = (int) $order->getStoreId();
+
+        if (!$this->helperData->isEnabled($storeId)) {
+            return 0;
+        }
+
+        // Get order country code
+        $billingAddress = $order->getBillingAddress();
+        $orderCountry = $billingAddress->getCountryId();
+
+        if(is_array($this->helperData->getCountries($storeId))) {
+            if(
+                ($this->helperData->getCountries($storeId) && !in_array($orderCountry, $this->helperData->getCountries($storeId)))
+                ) {
+                return 0;
+            }
+        }
+        
+
         // All customers
-        if($this->helperData->getApiVerificoMode()==0) { 
+        if($this->helperData->getApiVerificoMode($storeId)==0) { 
             return 1;
         }
 
         // Specific Products
-        if($this->helperData->getApiVerificoMode()==1) { 
+        if($this->helperData->getApiVerificoMode($storeId)==1) { 
                 foreach($order->getAllItems() as $item) {
                     $product = $item->getProduct();
                     if($product->getAgeVerifiedVerifyProductYesNo()==1) {
@@ -105,9 +124,9 @@ class Verify {
         }
 
         // Specific Categories
-        if($this->helperData->getApiVerificoMode()==2) { 
+        if($this->helperData->getApiVerificoMode($storeId)==2) { 
             $orderAllItems = $order->getAllItems();
-            $selectedCategories = explode(',', $this->helperData->getSelectedCategory());
+            $selectedCategories = explode(',', $this->helperData->getSelectedCategory($storeId));
 
             if ($orderAllItems) {
                 foreach ($orderAllItems as $item) {
@@ -170,8 +189,6 @@ class Verify {
         $client = $this->clientFactory->create(['config' => [
             'base_uri' => $apiConnection['request_uri']
         ]]);
-
-        // $data['merchantSecretKey'] = $apiConnection['private_key'];
 
         try {
 

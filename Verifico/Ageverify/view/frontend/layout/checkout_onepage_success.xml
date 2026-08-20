@@ -2,7 +2,7 @@
 <page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" layout="1column" xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">
     <body>
         <referenceContainer name="after.body.start">
-            <block class="Verifico\Ageverify\Block\Success" name="checkout.verifico.data" template="Verifico_Ageverify::checkout/data.phtml" cacheable="false" before="-">
+            <block class="Verifico\Ageverify\Block\Success" name="checkout.verifico.data" template="Verifico_Ageverify::checkout/data.phtml" cacheable="false" before="-" ifconfig="verificounitysection/general/enable">
                 <!-- <container name="order.success.additional.info" label="Order Success Additional Info"/> -->
             </block>  
         </referenceContainer>

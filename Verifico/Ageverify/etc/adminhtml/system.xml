@@ -10,33 +10,32 @@
             <tab>verificounity</tab>
             <resource>Verifico_Ageverify::age_configuration</resource>
 
-            <group id="setup" translate="label" type="text" sortOrder="0" showInDefault="1" showInWebsite="1" showInStore="1">
+            <!-- <group id="setup" translate="label" type="text" sortOrder="0" showInDefault="1" showInWebsite="1" showInStore="1">
                 <label>Start using AgeChecked Plus+</label>
                 <attribute type="expanded">1</attribute>
                 <field id="verifico_setup" showInDefault="1" showInWebsite="1" showInStore="1" sortOrder="0">
                         <frontend_model>Verifico\Ageverify\Block\Adminhtml\System\Config\Advanced</frontend_model>
                         <attribute type="shared">1</attribute>
                 </field>
-            </group>
+            </group> -->
             
             <group id="general" translate="label" type="text" sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="1">
                 <label>General Configuration</label>
-                <attribute type="expanded">1</attribute>
-                
-                
-                <!--field id="enable" translate="label" type="select" sortOrder="0" showInDefault="1" showInWebsite="1" showInStore="1">
-                    <label>Enable AgeChecked</label>
+                <attribute type="expanded">1</attribute>                
+
+                <field id="enable" translate="label" type="select" sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Enable Age Verification</label>
                     <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
-                </field-->
-
-
-                
+                    <comment>Disable to turn off all AgeChecked Plus+ functionality for this scope.</comment>
+                </field>
 
                 <field id="only_flagged_products" translate="label" type="select" sortOrder="80" showInDefault="1" showInWebsite="1" showInStore="1">
                     <label>Verify Mode</label>
-                    <!--source_model>Magento\Config\Model\Config\Source\Yesno</source_model-->
                     <source_model>Verifico\Ageverify\Model\Config\Source\Allspecificproducts</source_model>
                     <comment>You can set which products you want age verification on. By default all orders are verified.</comment>
+                    <depends>
+                        <field id="enable">1</field>
+                    </depends>
                 </field>
 
 
@@ -56,10 +55,16 @@
                     <comment>You can set an individual product to verify by editing the product in the Magento admin panel and placing a tick in the AgeChecked section.</comment>
                 
                 </field>
+                <field id="allowed_countries" translate="label" type="multiselect" sortOrder="102" showInDefault="1" showInWebsite="1" canRestore="1">
+                    <label>Allow Countries</label>
+                    <source_model>Magento\Directory\Model\Config\Source\Country</source_model>
+                    <can_be_empty>1</can_be_empty>
+                    <comment>By default this is limited to GB only.</comment>
+                    <depends>
+                        <field id="enable">1</field>
+                    </depends>
+                </field>
             </group>
-            
-
-
         </section>
     </system>
 </config>

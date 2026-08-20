@@ -79,12 +79,14 @@ class OrderRepository
     }
 
     public function beforeSave(OrderRepositoryInterface $subject, OrderInterface $order) {
-        $extensionAttributes = $order->getExtensionAttributes() ?: $this->extensionFactory->create();
-            if ($extensionAttributes !== null && $extensionAttributes->getUnityAgeVerificationStatus() !== null) {
-                $order->setUnityAgeVerificationStatus($extensionAttributes->getUnityAgeVerificationStatus());
-            }
-        
-            return [$order];
+        $extensionAttributes = $order->getExtensionAttributes();
+        if ($extensionAttributes && $extensionAttributes->getUnityAgeVerificationStatus() !== null) {
+            $order->setData(
+                self::UNITY_AGE_VERIFICATION_STATUS,
+                $extensionAttributes->getUnityAgeVerificationStatus()
+            );
+        }
+        return [$order];
     }
 
 }

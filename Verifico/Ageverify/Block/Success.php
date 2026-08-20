@@ -39,21 +39,24 @@ class Success extends \Magento\Checkout\Block\Onepage\Success {
     public function getAvOrderItems($order = []) {
         
         if(empty($order)) {
-            $orderAllItems = $this->_checkoutSession->getLastRealOrder()->getAllItems();
+            $lastOrder = $this->_checkoutSession->getLastRealOrder();
+            $orderAllItems = $lastOrder->getAllItems();
+            $storeId = $lastOrder->getStoreId();
         } else {
             $orderAllItems = $order->getAllItems();
+            $storeId = $order->getStoreId();
         }
         
-        return $this->processOrderItems($orderAllItems);
+        return $this->processOrderItems($orderAllItems, $storeId);
         
     }
 
-    public function processOrderItems($orderAllItems) {
+    public function processOrderItems($orderAllItems, $storeId = null) {
         $i = [];
 
 
         //Check verify mode and if selected products skip verify if nothing needs verification
-        if($this->_helperData->getApiVerificoMode()==1) {
+        if($this->_helperData->getApiVerificoMode($storeId)==1) {
 
             $s=0;
             if ($orderAllItems) {
@@ -76,11 +79,11 @@ class Success extends \Magento\Checkout\Block\Onepage\Success {
                     $s++;
                 }
             }
-        } else if($this->_helperData->getApiVerificoMode()==2) {
+        } else if($this->_helperData->getApiVerificoMode($storeId)==2) {
             
 
             //Get categories that require verification
-            $selectedCategories = explode(',', $this->_helperData->getSelectedCategory());
+            $selectedCategories = explode(',', $this->_helperData->getSelectedCategory($storeId));
             $s=0;
             if ($orderAllItems) {
                 
