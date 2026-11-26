@@ -5,6 +5,9 @@
             <general>
                 <enable>0</enable>
                 <allowed_countries>GB</allowed_countries>
+                <hold_orders>0</hold_orders>
+                <cron_enable>1</cron_enable>
+                <cron_lookback_hours>48</cron_lookback_hours>
             </general>
         </verificounitysection>
     </default>

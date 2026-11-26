@@ -1,12 +1,6 @@
 <?php
 namespace Verifico\Ageverify\Helper;
 
-use Magento\Framework\App\Helper\AbstractHelper;
-use Magento\Store\Model\StoreManagerInterface;
-use Magento\Framework\ObjectManagerInterface;
-use Magento\Framework\App\Helper\Context;
-use Magento\Store\Model\ScopeInterface;
-
 class Data extends \Magento\Framework\App\Helper\AbstractHelper
 {
 
@@ -18,11 +12,6 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
             $storeId
 				);
 		}
-
-	public function getApiVerificoEnable($storeId = null)
-    {
-		return (int) $this->isEnabled($storeId);
-    }
 
     public function getApiVerificoMode($storeId = null)
     {
@@ -41,6 +30,33 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
 		$storeId
 		);
     } 
+
+    public function isHoldEnabled($storeId = null): bool
+    {
+		return $this->scopeConfig->isSetFlag(
+		'verificounitysection/general/hold_orders',
+		\Magento\Store\Model\ScopeInterface::SCOPE_STORE,
+		$storeId
+		);
+    }
+
+    public function isCronEnabled($storeId = null): bool
+    {
+		return $this->scopeConfig->isSetFlag(
+		'verificounitysection/general/cron_enable',
+		\Magento\Store\Model\ScopeInterface::SCOPE_STORE,
+		$storeId
+		);
+    }
+
+    public function getCronLookbackHours($storeId = null): int
+    {
+		return max(1, (int) $this->scopeConfig->getValue(
+		'verificounitysection/general/cron_lookback_hours',
+		\Magento\Store\Model\ScopeInterface::SCOPE_STORE,
+		$storeId
+		));
+    }
 
     public function getCountries($storeId = null)
     {

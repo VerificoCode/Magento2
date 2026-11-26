@@ -1,10 +1,12 @@
 <?xml version="1.0"?>
-<page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" layout="1column" xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">
+<page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">
     <body>
         <referenceContainer name="after.body.start">
-            <block class="Verifico\Ageverify\Block\Success" name="checkout.verifico.data" template="Verifico_Ageverify::checkout/data.phtml" cacheable="false" before="-" ifconfig="verificounitysection/general/enable">
-                <!-- <container name="order.success.additional.info" label="Order Success Additional Info"/> -->
-            </block>  
+            <block class="Magento\Framework\View\Element\Template" name="checkout.verifico.data" template="Verifico_Ageverify::checkout/data.phtml" cacheable="false" before="-" ifconfig="verificounitysection/general/enable">
+                <arguments>
+                    <argument name="view_model" xsi:type="object">Verifico\Ageverify\ViewModel\SuccessTransaction</argument>
+                </arguments>
+            </block>
         </referenceContainer>
     </body>
 </page>

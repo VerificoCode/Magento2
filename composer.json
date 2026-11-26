@@ -2,9 +2,10 @@
   "name": "verifico/ageverify",
   "description": "AgeChecked Plus+ age verification module for Magento 2",
   "type": "magento2-module",
+  "version": "1.2.0",
   "license": "GPL-3.0-or-later",
   "require": {
-    "php": "^7.4 || ^8.1 || ^8.2 || ^8.3 || ^8.4",
+    "php": "~8.1.0 || ~8.2.0 || ~8.3.0 || ~8.4.0 || ~8.5.0",
     "magento/framework": "^103.0"
   },
   "authors": [

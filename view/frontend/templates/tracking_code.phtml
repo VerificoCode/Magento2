@@ -1,8 +1,15 @@
+<?php
+/** @var \Verifico\Ageverify\Block\Tracking $block */
+/** @var \Magento\Framework\View\Helper\SecureHtmlRenderer $secureRenderer */
+$src = json_encode($block->getUnityUrl() . '/tr/?domain=', JSON_HEX_TAG | JSON_UNESCAPED_SLASHES | JSON_THROW_ON_ERROR);
+?>
 <!-- BEGIN Verifico_Ageverify -->
-<script>
-var script = document.createElement('script');
-script.src = "<?php echo $block->getUnityUrl() ?>/tr/?domain="+window.location.hostname;
-script.async = true;
-document.getElementsByTagName('head')[0].appendChild(script);
-</script>
+<?= /* @noEscape */ $secureRenderer->renderTag('script', [], <<<JS
+(function () {
+    var script = document.createElement('script');
+    script.src = {$src} + encodeURIComponent(window.location.hostname);
+    script.async = true;
+    document.head.appendChild(script);
+})();
+JS, false) ?>
 <!-- END Verifico_Ageverify -->

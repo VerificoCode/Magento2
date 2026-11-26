@@ -1,47 +1,73 @@
 <?php
+
 namespace Verifico\Ageverify\Cron;
 
-class Pending 
+use Magento\Sales\Model\ResourceModel\Order\CollectionFactory;
+use Magento\Store\Model\StoreManagerInterface;
+use Verifico\Ageverify\Helper\Data as HelperData;
+use Verifico\Ageverify\Model\Verify;
+
+/**
+ * Safety net for the success page block: pushes recent orders still in 'Pending'
+ * age verification to AgeChecked Plus+ once, in case the frontend never sent them.
+ */
+class Pending
 {
+    /** Give the success page a chance to send the order first. */
+    private const GRACE_SECONDS = 900;
 
-    public function execute()
-    {   
-        // Get all orders and filter by custom attribute - limit by date range to last x days
-        $orders = $this->getOrders();
+    /** ponytail: oldest-first page per store per run; raise if a store outpaces 100 AV orders per 5 minutes */
+    private const BATCH_SIZE = 100;
 
-        // Loop through list and send to ACP
-        foreach($orders as $order) {
+    /** Unpaid or finished orders: nothing to verify. A held order is judged by the state it was held from. */
+    private const SKIP_STATES = ['pending_payment', 'payment_review', 'canceled', 'closed'];
 
-            $order = $this->order->load($order['order_id']);
-
-            // Push to ACP
-
-        }
-        
-            
+    public function __construct(
+        private StoreManagerInterface $storeManager,
+        private CollectionFactory $orderCollectionFactory,
+        private HelperData $helperData,
+        private Verify $verify
+    ) {
     }
 
-
-    public function getOrders()
+    public function execute(): void
     {
-        $to = date("Y-m-d H:i:s");
-        $from = strtotime('-2 day', strtotime($to));
-        $from = date('Y-m-d H:i:s', $from);
-        // $from = '2021-04-27 00:00:00';
-        // To get orders
-        // Get orders from age_verified where there is no apprived status
+        $now = time();
 
-        $collection = $this->_orderCollectionFactory->create();
+        foreach ($this->storeManager->getStores() as $store) {
+            $storeId = (int) $store->getId();
+            if (!$this->helperData->isEnabled($storeId) || !$this->helperData->isCronEnabled($storeId)) {
+                continue;
+            }
 
-        // $collection->addFieldToSelect('customer_email, increment_id, agechecked_ageverifiedid, entity_id as order_id');
-        $collection->addFieldToSelect(['order_id' => 'entity_id', 'increment_id', 'unity_age_verification_status', 'customer_email']);
-        $collection->addFieldToFilter('main_table.created_at', array('from'=>$from, 'to'=>$to));
-        $collection->addFieldToFilter('main_table.unity_age_verification_status', ['eq' => 'Pending']);
-        // $collection->addFieldToFilter('main_table.state', ['nin' => ["canceled","complete","closed","processing"]]);
-        // $collection->columns(['entity_id' => 'order_id', 'customer_email' => 'customer_email']);
+            $from = $now - $this->helperData->getCronLookbackHours($storeId) * 3600;
+            // sales_order.created_at is stored in UTC
+            $collection = $this->orderCollectionFactory->create()
+                ->addFieldToFilter('store_id', $storeId)
+                ->addFieldToFilter('unity_age_verification_status', 'Pending')
+                ->addFieldToFilter('unity_age_verification_sent_at', ['null' => true])
+                ->addFieldToFilter('state', ['nin' => self::SKIP_STATES])
+                ->addFieldToFilter('created_at', [
+                    'from' => gmdate('Y-m-d H:i:s', $from),
+                    'to' => gmdate('Y-m-d H:i:s', $now - self::GRACE_SECONDS),
+                ])
+                ->setOrder('created_at', 'ASC')
+                ->setPageSize(self::BATCH_SIZE);
+            $collection->getSelect()->where(
+                "NOT (main_table.state = 'holded' AND IFNULL(main_table.hold_before_state, '') IN (?))",
+                self::SKIP_STATES
+            );
 
-        return $collection;
+            foreach ($collection as $order) {
+                if ($this->verify->ageVerifyOrder($order)) {
+                    // Direct update: a full order save would re-run order observers and plugins
+                    $collection->getConnection()->update(
+                        $collection->getMainTable(),
+                        ['unity_age_verification_sent_at' => gmdate('Y-m-d H:i:s')],
+                        ['entity_id = ?' => (int) $order->getId()]
+                    );
+                }
+            }
+        }
     }
-
-    
 }

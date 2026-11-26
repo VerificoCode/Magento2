@@ -1,67 +1,52 @@
 <?php
+
 namespace Verifico\Ageverify\Observer\Orders;
 
+use Magento\Framework\Event\Observer;
 use Magento\Framework\Event\ObserverInterface;
+use Magento\Sales\Model\Order;
+use Verifico\Ageverify\Helper\Data as HelperData;
+use Verifico\Ageverify\Model\Verify;
 
+/**
+ * Sets the Age Verification Status on a new order, and holds it when "Hold Orders Awaiting
+ * Age Verification" is on.
+ */
 class AgeVerificationStatus implements ObserverInterface
-{   
-  /** @var \Magento\Sales\Model\Order */
-  private $order;
-
-  /** @var \Verifico\Ageverify\Model\Verify */
-  private $verify;
-
-  /** @var \Verifico\Ageverify\Helper\Data */
-  private $helperData;
-
-  public function __construct(
-   \Magento\Sales\Model\Order $order,
-   \Verifico\Ageverify\Model\Verify $verify,
-   \Verifico\Ageverify\Helper\Data $helperData
-  ) 
-{        
- $this->order = $order; 
- $this->verify = $verify;
- $this->helperData = $helperData;
-}
-
-public function execute(\Magento\Framework\Event\Observer $observer)
- {   
-  
-  //   $orderId = $observer->getEvent()->getOrder()->getId();
-  //   $order = $this->order->load($orderId); 
-
-  $order = $observer->getEvent()->getOrder();
-
-  if(!$order instanceof \Magento\Sales\Model\Order) {
-    return;
-  }
-
-  if (!$this->helperData->isEnabled($order->getStoreId())) {
-    $order->setUnityAgeVerificationStatus('Age Verification Disabled');
-    return;
-  }
-
-  $shouldVerify = $this->verify->shouldVerify($order);
-
-  if($shouldVerify) {
-    // Place on hold
-    if($order->canHold()) {
-      $order->hold(); 
+{
+    public function __construct(
+        private Verify $verify,
+        private HelperData $helperData
+    ) {
     }
-    
-    $order->setUnityAgeVerificationStatus('Pending');
-    // $order->save();
 
-  } else  {
+    public function execute(Observer $observer)
+    {
+        $order = $observer->getEvent()->getOrder();
+        if (!$order instanceof Order) {
+            return;
+        }
 
-    // If the order does not require age verification
-    $order->setUnityAgeVerificationStatus('Age Verification Not Required');
-    // $order->save();
+        if (!$this->helperData->isEnabled($order->getStoreId())) {
+            $order->setUnityAgeVerificationStatus('Age Verification Disabled');
+            return;
+        }
 
-  }
+        if (!$this->verify->shouldVerify($order)) {
+            $order->setUnityAgeVerificationStatus('Age Verification Not Required');
+            return;
+        }
 
+        $order->setUnityAgeVerificationStatus('Pending');
 
-  
- }
+        // Never hold an order still waiting for payment: a held order cannot be invoiced, so the
+        // payment callback would fail. ponytail: those orders are not held once paid either;
+        // hold on the later state change if stores need it.
+        if ($this->helperData->isHoldEnabled($order->getStoreId())
+            && $order->getState() !== Order::STATE_PENDING_PAYMENT
+            && $order->canHold()
+        ) {
+            $order->hold();
+        }
+    }
 }
