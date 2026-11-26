@@ -2,212 +2,168 @@
 
 namespace Verifico\Ageverify\Model;
 
-use Verifico\Ageverify\Helper\Data as HelperData;
-use Verifico\Ageverify\Block\Success;
-use GuzzleHttp\Client;
 use GuzzleHttp\ClientFactory;
 use GuzzleHttp\Exception\GuzzleException;
-use GuzzleHttp\Psr7\Response;
-use GuzzleHttp\Psr7\ResponseFactory;
-use Magento\Framework\Webapi\Rest\Request;
-use Magento\Framework\Stdlib\DateTime;
+use Magento\Framework\UrlInterface;
 use Magento\Sales\Model\Order;
-use Magento\Sales\Model\Order\Email\Sender\OrderSender as OrderSender;
-use Verifico\Ageverify\Model\Config;
+use Psr\Log\LoggerInterface;
+use Verifico\Ageverify\Helper\Data as HelperData;
 
-// use Magento\Integration\Model\IntegrationFactory;
-// use Magento\Integration\Model\OauthService;
-// use Magento\Integration\Model\AuthorizationService;
-// use Magento\Integration\Model\Oauth\Token;
-// use Verifico\Ageverify\Model\Config;
-
-class Verify {
-
-    protected $helperData;
-
-    /**
-     * @var ResponseFactory
-     */
-    private $responseFactory;
-
-    /**
-     * @var ClientFactory
-     */
-    private $clientFactory;
-
-    /**
-     * @var DateTime\DateTime
-     */
-    protected $_date;
-
-    protected $order;
-
-    protected $_helperData;
-
-    protected $_orderSender;
-
-    protected $_transportBuilder;
-
-    protected $_storeManager;
-
-    protected $_logger;
-
-    protected $authSession;
-
-    protected $success;
-
-    protected $unityConfig;
-
+class Verify
+{
     public function __construct(
-        HelperData $helperData,
-        ClientFactory $clientFactory,
-        ResponseFactory $responseFactory,
-        DateTime\DateTime $date,
-        Order $order,
-        OrderSender $orderSender,
-        \Magento\Framework\Mail\Template\TransportBuilder $transportBuilder,
-        \Magento\Store\Model\StoreManagerInterface $storeManager,
-        \Psr\Log\LoggerInterface $logger,
-        \Magento\Backend\Model\Auth\Session $authSession,
-        Success $success,
-        \Verifico\Ageverify\Model\Config $unityConfig
-        ) {
-        $this->helperData = $helperData;
-        $this->clientFactory = $clientFactory;
-        $this->responseFactory = $responseFactory;
-        $this->_date = $date;
-        $this->order = $order;
-        $this->_orderSender = $orderSender;
-        $this->_transportBuilder = $transportBuilder;
-        $this->_storeManager = $storeManager;
-        $this->_logger = $logger;
-        $this->authSession = $authSession;
-        $this->success = $success;
-        $this->unityConfig = $unityConfig;
+        private HelperData $helperData,
+        private ClientFactory $clientFactory,
+        private LoggerInterface $logger,
+        private Config $unityConfig
+    ) {
     }
 
-    public function shouldVerify($order) {
-
+    public function shouldVerify($order)
+    {
         $storeId = (int) $order->getStoreId();
 
         if (!$this->helperData->isEnabled($storeId)) {
             return 0;
         }
 
-        // Get order country code
-        $billingAddress = $order->getBillingAddress();
-        $orderCountry = $billingAddress->getCountryId();
-
-        if(is_array($this->helperData->getCountries($storeId))) {
-            if(
-                ($this->helperData->getCountries($storeId) && !in_array($orderCountry, $this->helperData->getCountries($storeId)))
-                ) {
-                return 0;
-            }
+        // Config stores the multiselect as "GB,US"; empty means every country
+        $countries = array_filter(explode(',', (string) $this->helperData->getCountries($storeId)));
+        if ($countries && !in_array($order->getBillingAddress()?->getCountryId(), $countries, true)) {
+            return 0;
         }
-        
+
+        $mode = (int) $this->helperData->getApiVerificoMode($storeId);
 
         // All customers
-        if($this->helperData->getApiVerificoMode($storeId)==0) { 
+        if ($mode === 0) {
             return 1;
         }
 
-        // Specific Products
-        if($this->helperData->getApiVerificoMode($storeId)==1) { 
-                foreach($order->getAllItems() as $item) {
-                    $product = $item->getProduct();
-                    if($product->getAgeVerifiedVerifyProductYesNo()==1) {
-                        // Should verify
-                        return 1;
-                    };
-                }
-        }
-
-        // Specific Categories
-        if($this->helperData->getApiVerificoMode($storeId)==2) { 
-            $orderAllItems = $order->getAllItems();
-            $selectedCategories = explode(',', $this->helperData->getSelectedCategory($storeId));
-
-            if ($orderAllItems) {
-                foreach ($orderAllItems as $item) {
-                    $product = $item->getProduct();
-
-                    $categoryIds = $product->getCategoryIds();
-                    if (!empty(array_intersect($categoryIds, $selectedCategories))) {
-                        // Should verify
-                        return 1;
-                    }
-
-
-
-                }
+        $selectedCategories = explode(',', (string) $this->helperData->getSelectedCategory($storeId));
+        foreach ($order->getAllItems() as $item) {
+            // Product is null when it has been deleted since it was added to the cart
+            $product = $item->getProduct();
+            if (!$product) {
+                continue;
+            }
+            // Specific Products
+            if ($mode === 1 && $product->getAgeVerifiedVerifyProductYesNo() == 1) {
+                return 1;
+            }
+            // Specific Categories
+            if ($mode === 2 && array_intersect((array) $product->getCategoryIds(), $selectedCategories)) {
+                return 1;
             }
         }
 
+        return 0;
     }
 
-    public function ageVerifyOrder($order) {
-
-        $acTransaction = [
-            "user" => [
-                "email" => $order->getCustomerEmail(),
-                "firstname" => $billingAddress->getFirstname(),
-                "lastname" => $billingAddress->getLastname(),
-                "dob" => $order->getCustomerDob(),
-                "order_id" => $order->getId(),
-                "order_ref" => $order->getIncrementId(),
-                "address" => [
-                    "address1" => $billingAddress->getStreet()[0],
-                    "address2" => "",
-                    "address3" => "",
-                    "city" => $billingAddress->getCity(),
-                    "postcode" => $billingAddress->getPostcode(),
-                    "county" => $billingAddress->getRegion(),
-                    "country" => $billingAddress->getCountryId()
-                ]
-            ]
-        ];
-
-        // Add products
-        $acTransaction["cart"] = $this->success->getAvOrderItems($order);
-
-        $request = $acTransaction;
-
-        $url = $this->unityConfig->getUnityIntegrationName()."/r?site_key=testkey";
-
-        $response = $this->doRequest($endPointPath, $request, Request::HTTP_METHOD_POST);
-
-    }
-
-    private function doRequest(
-        string $uriEndpoint,
-        array $data = [],
-        string $requestMethod = Request::HTTP_METHOD_POST
-    ): Response {
-        /** @var Client $client */
-        // $apiConnection = $this->_helperData->getApiLoadAgeCheck();
-        $client = $this->clientFactory->create(['config' => [
-            'base_uri' => $apiConnection['request_uri']
-        ]]);
-
-        try {
-
-            $response = $client->request(
-                $requestMethod,
-                $uriEndpoint,
-                ['json' => $data]
-            );
-            
-            
-        } catch (GuzzleException $exception) {
-            /** @var Response $response */
-            $response = $this->responseFactory->create([
-                'status' => $exception->getCode(),
-                'reason' => $exception->getMessage()
-            ]);
+    /**
+     * The order as AgeChecked Plus+ expects it, used by the success page script and the cron.
+     */
+    public function getTransaction(Order $order): ?array
+    {
+        $billingAddress = $order->getBillingAddress();
+        if (!$billingAddress) {
+            return null;
         }
 
-        return $response;
+        $storeId = $order->getStoreId();
+        $mode = (int) $this->helperData->getApiVerificoMode($storeId);
+        $selectedCategories = explode(',', (string) $this->helperData->getSelectedCategory($storeId));
+        $products = [];
+
+        foreach ($order->getAllItems() as $item) {
+            $product = $item->getProduct();
+            $products[] = [
+                'id' => $item->getSku(),
+                'name' => $item->getName(),
+                'price' => (string) $item->getBaseRowTotalInclTax(),
+                'quantity' => (int) $item->getQtyOrdered(),
+                'requires_av' => match ($mode) {
+                    1 => (int) ($product && $product->getAgeVerifiedVerifyProductYesNo() == 1),
+                    2 => (int) ($product && array_intersect((array) $product->getCategoryIds(), $selectedCategories)),
+                    default => 1,
+                },
+            ];
+        }
+
+        return [
+            'user' => [[
+                'email' => $order->getCustomerEmail(),
+                'firstname' => $billingAddress->getFirstname(),
+                'lastname' => $billingAddress->getLastname(),
+                'dob' => (string) $order->getCustomerDob(),
+                'order_id' => (string) $order->getId(),
+                'order_ref' => $order->getIncrementId(),
+                'site_transaction_id' => $order->getIncrementId(),
+                'address' => [
+                    'address1' => $billingAddress->getStreet()[0] ?? '',
+                    'address2' => '',
+                    'address3' => '',
+                    'city' => $billingAddress->getCity(),
+                    'postcode' => $billingAddress->getPostcode(),
+                    'county' => $billingAddress->getRegion(),
+                    'country' => $billingAddress->getCountryId(),
+                ],
+            ]],
+            'cart' => [['products' => $products]],
+        ];
     }
 
+    /**
+     * Push an order to AgeChecked Plus+. It ignores orders it already has, so a repeat send is harmless.
+     */
+    public function ageVerifyOrder(Order $order): bool
+    {
+        $payload = $this->getTransaction($order);
+        if ($payload === null) {
+            return false;
+        }
+
+        // Secure URL explicitly: cron has no request, so the default would be web/unsecure/base_url
+        $baseUrl = (string) $order->getStore()->getBaseUrl(UrlInterface::URL_TYPE_LINK, true);
+        $url = parse_url($baseUrl);
+        if ($url === false || empty($url['scheme']) || empty($url['host'])
+            || !in_array(strtolower($url['scheme']), ['http', 'https'], true)
+        ) {
+            $this->logger->warning(sprintf(
+                'AgeChecked Plus+: invalid store base URL for order %s',
+                $order->getIncrementId()
+            ));
+            return false;
+        }
+
+        $scheme = strtolower($url['scheme']);
+        // Browsers send the host lowercased
+        $host = strtolower($url['host']);
+        $origin = $scheme . '://' . $host;
+        if (isset($url['port']) && !(($scheme === 'http' && $url['port'] === 80)
+            || ($scheme === 'https' && $url['port'] === 443))
+        ) {
+            $origin .= ':' . $url['port'];
+        }
+
+        try {
+            $this->clientFactory->create(['config' => ['timeout' => 15]])->request(
+                'POST',
+                $this->unityConfig->getUnityOrderUrl(),
+                [
+                    'query' => ['domain' => $host],
+                    'headers' => ['Origin' => $origin],
+                    'json' => $payload,
+                ]
+            );
+            return true;
+        } catch (GuzzleException $e) {
+            $this->logger->warning(sprintf(
+                'AgeChecked Plus+: failed to send order %s: %s',
+                $order->getIncrementId(),
+                $e->getMessage()
+            ));
+            return false;
+        }
+    }
 }

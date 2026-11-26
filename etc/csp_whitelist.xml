@@ -37,12 +37,5 @@
                 <value id="agechecked" type="host">unity.agechecked.com</value>
             </values>
         </policy>
-        <policy id="frame-ancestors">
-            <values>
-                <value id="self" type="host">'self'</value>
-                <value id="verifico" type="host">agechecked.verifico.io</value>
-                <value id="agechecked" type="host">unity.agechecked.com</value>
-            </values>
-        </policy>
     </policies>
 </csp_whitelist>

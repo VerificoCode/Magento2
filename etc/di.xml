@@ -1,7 +1,19 @@
 <?xml version="1.0"?>
-<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../../../../../vendor/magento/framework/ObjectManager/etc/config.xsd">
-    <preference for="Magento\Checkout\Block\Onepage\Success" type="Verifico\Ageverify\Block\Success"/>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:ObjectManager/etc/config.xsd">
     <type name="Magento\Sales\Api\OrderRepositoryInterface">
         <plugin name="unity_age_verification_status" type="Verifico\Ageverify\Plugin\Api\OrderRepository"/>
+    </type>
+    <!-- Global so the status reaches the order grid however the order is saved (storefront, admin, API) -->
+    <virtualType name="Magento\Sales\Model\ResourceModel\Order\Grid" type="Magento\Sales\Model\ResourceModel\Grid">
+        <arguments>
+            <argument name="columns" xsi:type="array">
+                <item name="unity_age_verification_status" xsi:type="string">sales_order.unity_age_verification_status</item>
+            </argument>
+        </arguments>
+    </virtualType>
+    <type name="Verifico\Ageverify\ViewModel\SuccessTransaction">
+        <arguments>
+            <argument name="checkoutSession" xsi:type="object">Magento\Checkout\Model\Session\Proxy</argument>
+        </arguments>
     </type>
 </config>

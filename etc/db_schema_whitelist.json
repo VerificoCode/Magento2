@@ -1,0 +1,13 @@
+{
+    "sales_order": {
+        "column": {
+            "unity_age_verification_status": true,
+            "unity_age_verification_sent_at": true
+        }
+    },
+    "sales_order_grid": {
+        "column": {
+            "unity_age_verification_status": true
+        }
+    }
+}

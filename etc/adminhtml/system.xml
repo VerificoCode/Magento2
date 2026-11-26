@@ -1,5 +1,5 @@
 <?xml version="1.0"?>
-<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../../../Config/etc/system_file.xsd">
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Config:etc/system_file.xsd">
     <system>
         <tab id="verificounity" translate="label" sortOrder="1" class="verifico-tab verifico-tab-container">
             <label>AgeChecked Plus+</label>
@@ -10,15 +10,6 @@
             <tab>verificounity</tab>
             <resource>Verifico_Ageverify::age_configuration</resource>
 
-            <!-- <group id="setup" translate="label" type="text" sortOrder="0" showInDefault="1" showInWebsite="1" showInStore="1">
-                <label>Start using AgeChecked Plus+</label>
-                <attribute type="expanded">1</attribute>
-                <field id="verifico_setup" showInDefault="1" showInWebsite="1" showInStore="1" sortOrder="0">
-                        <frontend_model>Verifico\Ageverify\Block\Adminhtml\System\Config\Advanced</frontend_model>
-                        <attribute type="shared">1</attribute>
-                </field>
-            </group> -->
-            
             <group id="general" translate="label" type="text" sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="1">
                 <label>General Configuration</label>
                 <attribute type="expanded">1</attribute>                
@@ -62,6 +53,31 @@
                     <comment>By default this is limited to GB only.</comment>
                     <depends>
                         <field id="enable">1</field>
+                    </depends>
+                </field>
+                <field id="hold_orders" translate="label" type="select" sortOrder="105" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Hold Orders Awaiting Age Verification</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                    <comment>Put orders that need age verification on hold when they are placed, so they are not fulfilled before the customer is verified. Orders still waiting for payment are not held. Release them yourself, or let AgeChecked Plus+ release them if your package does.</comment>
+                    <depends>
+                        <field id="enable">1</field>
+                    </depends>
+                </field>
+                <field id="cron_enable" translate="label" type="select" sortOrder="110" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Send Pending Orders in Background</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                    <comment>Every 5 minutes, send orders still awaiting age verification to AgeChecked Plus+ in case the checkout success page did not. Each order is sent once.</comment>
+                    <depends>
+                        <field id="enable">1</field>
+                    </depends>
+                </field>
+                <field id="cron_lookback_hours" translate="label" type="text" sortOrder="111" showInDefault="1" showInWebsite="1" showInStore="1" canRestore="1">
+                    <label>Only Send Orders Placed Within (hours)</label>
+                    <validate>required-entry validate-digits validate-greater-than-zero</validate>
+                    <comment>Orders older than this are never sent, so historical orders are left alone.</comment>
+                    <depends>
+                        <field id="enable">1</field>
+                        <field id="cron_enable">1</field>
                     </depends>
                 </field>
             </group>

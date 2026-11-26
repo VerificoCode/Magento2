@@ -1,0 +1,15 @@
+<?php
+/** @var \Magento\Backend\Block\Template $block */
+/** @var \Magento\Framework\Escaper $escaper */
+$status = (string) $block->getParentBlock()->getOrder()->getUnityAgeVerificationStatus();
+?>
+<tr>
+    <th><?= $escaper->escapeHtml(__('Age Verification Status')) ?></th>
+    <td>
+        <?php if ($status !== ''): ?>
+            <?= $escaper->escapeHtml($status, \Verifico\Ageverify\Ui\Component\Listing\Column\UnityAgeVerificationStatus::ALLOWED_TAGS) ?>
+        <?php else: ?>
+            <span title="<?= $escaper->escapeHtmlAttr(__('This order was placed before the Age Verification plugin was installed or when the plugin was disabled')) ?>">ⓘ</span>
+        <?php endif; ?>
+    </td>
+</tr>

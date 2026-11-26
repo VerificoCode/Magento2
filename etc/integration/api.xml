@@ -19,6 +19,10 @@
             <resource name="Magento_Sales::sales_creditmemo" />
             <resource name="Magento_Sales::create" />
             <resource name="Magento_Sales::actions_create" />
+            <!-- POST /V1/orders (set the Age Verification Status) needs this from Magento 2.4.8; ignored on earlier versions -->
+            <resource name="Magento_Sales::api_actions" />
+            <!-- Find and refund invoices -->
+            <resource name="Magento_Sales::sales_invoice" />
         </resources>
     </integration>
 </integrations>
