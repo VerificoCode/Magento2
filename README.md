@@ -90,7 +90,7 @@ These are all the calls AgeChecked Plus+ can make. Which ones it actually makes 
 | Find the order's invoice | GET | `/rest/V1/invoices?searchCriteria[...]` | `Magento_Sales::sales_invoice` |
 | Refund the invoice online | POST | `/rest/V1/invoice/{invoiceId}/refund` | `Magento_Sales::sales_invoice` |
 
-New installs grant these permissions automatically. Stores upgrading from an earlier version must reauthorise the integration (System > Extensions > Integrations > Reauthorize) to pick up `Magento_Sales::api_actions` and `Magento_Sales::sales_invoice`.
+New installs grant these permissions automatically. Stores upgrading from an earlier version must reauthorise the integration (System > Extensions > Integrations > Reauthorize) so it has exactly the permissions listed above.
 
 To limit who can call the API with the integration's token, ask clientservice@agechecked.com for the IP addresses AgeChecked Plus+ sends requests from, and allow only those at your firewall, web server or CDN.
 
