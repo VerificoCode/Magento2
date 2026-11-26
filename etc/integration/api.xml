@@ -1,27 +1,22 @@
 <integrations>
     <integration name="AgeCheckedPlus+Verifico">
         <resources>
-            <!-- To grant permission to Magento_Log::online, its parent Magento_Customer::customer needs to be declared as well-->
-            <resource name="Magento_Customer::customer" />
-            <resource name="Magento_Log::online" />
-            <!-- To grant permission to Magento_Sales::reorder, all its parent resources need to be declared-->
+            <!-- Parents of the order and invoice permissions below, declared as Magento's integration docs require -->
             <resource name="Magento_Sales::sales" />
             <resource name="Magento_Sales::sales_operation" />
             <resource name="Magento_Sales::sales_order" />
             <resource name="Magento_Sales::actions" />
-            <resource name="Magento_Sales::reorder" />
+            <!-- GET /V1/orders/{id} -->
+            <resource name="Magento_Sales::actions_view" />
+            <!-- POST /V1/orders/{id}/hold and /unhold -->
             <resource name="Magento_Sales::hold" />
             <resource name="Magento_Sales::unhold" />
+            <!-- POST /V1/orders/{id}/comments -->
             <resource name="Magento_Sales::comment" />
-            <resource name="Magento_Sales::creditmemo" />
-            <resource name="Magento_Sales::actions_edit" />
-            <resource name="Magento_Sales::actions_view" />
-            <resource name="Magento_Sales::sales_creditmemo" />
+            <!-- POST /V1/orders (set the Age Verification Status): create up to Magento 2.4.7, api_actions from 2.4.8 -->
             <resource name="Magento_Sales::create" />
-            <resource name="Magento_Sales::actions_create" />
-            <!-- POST /V1/orders (set the Age Verification Status) needs this from Magento 2.4.8; ignored on earlier versions -->
             <resource name="Magento_Sales::api_actions" />
-            <!-- Find and refund invoices -->
+            <!-- GET /V1/invoices and POST /V1/invoice/{id}/refund -->
             <resource name="Magento_Sales::sales_invoice" />
         </resources>
     </integration>

@@ -1,5 +1,13 @@
 # Changelog
 
+## 1.2.1 - 2026-11-26
+
+### Changed
+- The integration requests only the permissions the AgeChecked Plus+ API calls need. Removed: `Magento_Customer::customer`, `Magento_Log::online`, `Magento_Sales::reorder`, `Magento_Sales::actions_edit`, `Magento_Sales::creditmemo`, `Magento_Sales::sales_creditmemo` and `Magento_Sales::actions_create`.
+
+### Upgrade notes
+- Reauthorise the "AgeCheckedPlus+Verifico" integration (System > Extensions > Integrations > Reauthorize) to drop the unused permissions.
+
 ## 1.2.0 - 2026-11-26
 
 ### Added
